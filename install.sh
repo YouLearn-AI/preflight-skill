@@ -55,6 +55,8 @@ if ! gh auth status >/dev/null 2>&1; then
   say "Run: gh auth login"
   gh auth login
 fi
+say "Configuring gh as git credential helper (so brew can clone private preflight repo)"
+gh auth setup-git
 ok "gh authenticated as $(gh api user --jq .login)"
 
 # Public deps via Homebrew
