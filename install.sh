@@ -5,10 +5,12 @@
 #
 # Installs:
 #   1. Homebrew (if missing)
-#   2. Public deps: audiokit, cua-driver, blackhole-2ch (cask), ffmpeg, tesseract
-#   3. preflight binary from YouLearn-AI/homebrew-preflight (private tap)
-#   4. Claude Code skill at ~/.claude/skills/preflight/
-#   5. Walks through macOS Privacy permissions
+#   2. Public deps: node, pnpm, ffmpeg, tesseract, blackhole-2ch (cask)
+#   3. audiokit (git clone + npm link from public YouLearn-AI/audiokit)
+#   4. cua-driver (upstream curl-bash installer from trycua/cua)
+#   5. preflight binary from YouLearn-AI/homebrew-preflight (private tap)
+#   6. Claude Code skill at ~/.claude/skills/preflight/
+#   7. Walks through macOS Privacy permissions
 #
 # Authentication: requires `gh auth login` to access the private brew tap.
 
@@ -55,15 +57,30 @@ if ! gh auth status >/dev/null 2>&1; then
 fi
 ok "gh authenticated as $(gh api user --jq .login)"
 
-# Public deps
-say "Tapping youlearn-ai/audiokit + trycua/cua"
-brew tap youlearn-ai/audiokit 2>&1 | grep -v "already tapped" || true
-brew tap trycua/cua 2>&1 | grep -v "already tapped" || true
-
-for pkg in audiokit cua-driver ffmpeg tesseract; do
+# Public deps via Homebrew
+for pkg in node pnpm ffmpeg tesseract; do
   brew list --versions "$pkg" >/dev/null 2>&1 || (say "Installing $pkg" && brew install "$pkg")
 done
 brew list --cask --versions blackhole-2ch >/dev/null 2>&1 || (say "Installing blackhole-2ch" && brew install --cask blackhole-2ch)
+
+# audiokit — git clone + npm link (no Homebrew tap)
+if ! command -v audiokit >/dev/null 2>&1; then
+  say "Installing audiokit (clone + npm link)"
+  AUDIOKIT_DIR="${AUDIOKIT_DIR:-$HOME/Projects/audiokit}"
+  if [[ ! -d "$AUDIOKIT_DIR/.git" ]]; then
+    mkdir -p "$(dirname "$AUDIOKIT_DIR")"
+    git clone https://github.com/YouLearn-AI/audiokit.git "$AUDIOKIT_DIR"
+  fi
+  ( cd "$AUDIOKIT_DIR" && npm install --silent && npm link --silent )
+fi
+ok "audiokit $(audiokit --version 2>/dev/null || echo present)"
+
+# cua-driver — upstream curl-bash installer (no Homebrew tap)
+if ! command -v cua-driver >/dev/null 2>&1; then
+  say "Installing cua-driver"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/trycua/cua/main/libs/cua-driver/scripts/install.sh)"
+fi
+ok "cua-driver $(cua-driver --version 2>/dev/null || echo present)"
 
 # Private preflight tap (gated to customer's GitHub user)
 say "Tapping private preflight brew tap"
