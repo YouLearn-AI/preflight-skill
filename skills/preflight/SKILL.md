@@ -28,7 +28,7 @@ The full doctrine is in **[`AGENTS.md`](../../../AGENTS.md)** (17 rules). This s
 
 Walk a new customer through this in order:
 
-1. **Install:** customers run `curl -fsSL https://raw.githubusercontent.com/YouLearn-AI/preflight-skill/main/install.sh | bash` (taps the private `YouLearn-AI/homebrew-preflight` brew tap for the prebuilt binary; installs audiokit via `git clone + npm link` and cua-driver via the upstream curl-bash). Internal teammates with source: `./install.sh` from the cloned repo.
+1. **Install:** customers run `curl -fsSL https://raw.githubusercontent.com/YouLearn-AI/preflight-skill-mvp-prototype/main/install.sh | bash` (taps the private `YouLearn-AI/homebrew-preflight-mvp-prototype` brew tap for the prebuilt binary; installs audiokit via `git clone + npm link` and cua-driver via the upstream curl-bash). Internal teammates with source: `./install.sh` from the cloned repo.
 2. **`preflight doctor --install-missing`** — brews missing public deps (blackhole-2ch, ffmpeg, tesseract); installs audiokit + cua-driver from their upstream public repos (no Homebrew tap exists for either); opens **System Settings → Privacy & Security** panes for permission grants: **Accessibility, Input Monitoring, Screen Recording, Microphone**.
 3. **Quit + relaunch terminal** after granting (TCC grants attach at process launch).
 4. **API keys** — `install.sh` prompts for both. If skipped:

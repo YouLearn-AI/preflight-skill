@@ -3,10 +3,10 @@
 #
 # Canonical source lives in the (private) preflight repo at
 # `release-templates/preflight-skill/install.sh`. The release workflow
-# mirrors it to the public `YouLearn-AI/preflight-skill` repo as
+# mirrors it to the public `YouLearn-AI/preflight-skill-mvp-prototype` repo as
 # `install.sh` so customers can bootstrap with:
 #
-#   curl -fsSL https://raw.githubusercontent.com/YouLearn-AI/preflight-skill/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/YouLearn-AI/preflight-skill-mvp-prototype/main/install.sh | bash
 #
 # Designed for "any external user": single Mac, no source access, no
 # YouLearn-AI internal context. Verbose-on-failure, idempotent, won't die on
@@ -37,7 +37,7 @@ require_tty() {
   # $1: short label of the step that needs a TTY
   if [[ "$HAVE_TTY" != 1 ]]; then
     die "$1 needs an interactive terminal (sudo / keyboard input). Re-run directly in a terminal:
-    bash <(curl -fsSL https://raw.githubusercontent.com/YouLearn-AI/preflight-skill/main/install.sh)"
+    bash <(curl -fsSL https://raw.githubusercontent.com/YouLearn-AI/preflight-skill-mvp-prototype/main/install.sh)"
   fi
 }
 
@@ -201,8 +201,8 @@ fi
 # which makes the install LOOK failed (exit 1) even though the formula
 # completed and `preflight` is on PATH. We disable -e here, then verify
 # success by checking the binary directly.
-say "Tapping YouLearn-AI/homebrew-preflight (private)"
-brew tap YouLearn-AI/homebrew-preflight git@github.com:YouLearn-AI/homebrew-preflight.git \
+say "Tapping YouLearn-AI/homebrew-preflight-mvp-prototype (private)"
+brew tap YouLearn-AI/homebrew-preflight-mvp-prototype git@github.com:YouLearn-AI/homebrew-preflight-mvp-prototype.git \
   >/dev/null 2>&1 || true
 
 if ! command -v preflight >/dev/null 2>&1; then
@@ -215,7 +215,7 @@ if ! command -v preflight >/dev/null 2>&1; then
 ${c_red}preflight is still not on PATH after brew install.${c_reset}
 
 Most likely your GitHub user ($(gh api user --jq .login 2>/dev/null || echo '?'))
-isn't a collaborator on YouLearn-AI/homebrew-preflight yet, so the formula
+isn't a collaborator on YouLearn-AI/homebrew-preflight-mvp-prototype yet, so the formula
 couldn't be fetched. Ping your YouLearn-AI contact with your GitHub username
 and they'll grant access.
 
@@ -244,7 +244,7 @@ elif [[ -f "$LOCAL_SKILL" ]]; then
     && { ok "Claude Code skill at $SKILL_DIR/SKILL.md (from local clone)"; SKILL_INSTALLED=1; }
 fi
 if [[ "$SKILL_INSTALLED" != 1 ]]; then
-  if curl -fsSL https://raw.githubusercontent.com/YouLearn-AI/preflight-skill/main/skills/preflight/SKILL.md \
+  if curl -fsSL https://raw.githubusercontent.com/YouLearn-AI/preflight-skill-mvp-prototype/main/skills/preflight/SKILL.md \
      -o "$SKILL_DIR/SKILL.md" 2>/dev/null && [[ -s "$SKILL_DIR/SKILL.md" ]]; then
     ok "Claude Code skill at $SKILL_DIR/SKILL.md (from public mirror)"
   else
@@ -314,7 +314,7 @@ fi
 # the auto-bump PR is unmerged. Surface the installed version prominently
 # AND warn if it's older than what the public skill repo expects.
 INSTALLED_VERSION="$(preflight --version 2>&1 | head -1 | tr -d 'v ')"
-EXPECTED_VERSION="$(curl -fsSL https://raw.githubusercontent.com/YouLearn-AI/preflight-skill/main/.version 2>/dev/null || true)"
+EXPECTED_VERSION="$(curl -fsSL https://raw.githubusercontent.com/YouLearn-AI/preflight-skill-mvp-prototype/main/.version 2>/dev/null || true)"
 if [[ -n "$EXPECTED_VERSION" && -n "$INSTALLED_VERSION" && "$INSTALLED_VERSION" != "$EXPECTED_VERSION" ]]; then
   warn "preflight $INSTALLED_VERSION installed but the public skill repo expects $EXPECTED_VERSION."
   warn "The brew tap formula likely hasn't been bumped yet. Try 'brew update && brew upgrade preflight' in a few minutes."
